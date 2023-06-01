@@ -1,0 +1,79 @@
+$date
+	Fri Jun 02 02:04:32 2023
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1s
+$end
+$scope module alutb $end
+$var wire 1 ! zout $end
+$var wire 32 " outp [31:0] $end
+$var wire 3 # gin [2:0] $end
+$var reg 32 $ a [31:0] $end
+$var reg 32 % b [31:0] $end
+$var reg 1 & f0 $end
+$var reg 1 ' f1 $end
+$var reg 1 ( f2 $end
+$var reg 1 ) f3 $end
+$var reg 1 * op0 $end
+$var reg 1 + op1 $end
+$scope module alu $end
+$var wire 32 , a [31:0] $end
+$var wire 32 - b [31:0] $end
+$var wire 3 . gin [2:0] $end
+$var reg 32 / less [31:0] $end
+$var reg 32 0 sum [31:0] $end
+$var reg 1 ! zout $end
+$upscope $end
+$scope module cont $end
+$var wire 1 * aluop0 $end
+$var wire 1 + aluop1 $end
+$var wire 1 & f0 $end
+$var wire 1 ' f1 $end
+$var wire 1 ( f2 $end
+$var wire 1 ) f3 $end
+$var reg 3 1 gout [2:0] $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b10 1
+b10010110 0
+bx /
+b10 .
+b1100100 -
+b110010 ,
+1+
+0*
+0)
+0(
+0'
+0&
+b1100100 %
+b110010 $
+b10 #
+b10010110 "
+0!
+$end
+#1
+1!
+b0 "
+b0 0
+b0 %
+b0 -
+b0 $
+b0 ,
+#2
+0!
+b11111111111111111111111111110001 "
+b11111111111111111111111111110001 0
+b11111111111111111111111111110110 %
+b11111111111111111111111111110110 -
+b11111111111111111111111111111011 $
+b11111111111111111111111111111011 ,
