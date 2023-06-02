@@ -1,4 +1,4 @@
-module alucont(aluop1,aluop0,f3,f2,f1,f0,gout);//Figure 4.12 
+module alucont(aluop1,aluop0,f5,f4,f3,f2,f1,f0,gout);//Figure 4.12 
 input aluop1,aluop0,f3,f2,f1,f0;
 output [2:0] gout;
 reg [2:0] gout;
@@ -13,6 +13,7 @@ begin
 	if (f1&~(f3))gout=3'b110;		//function code=0x10,ALU control=110 (sub)
 	if (f2&f0)gout=3'b001;			//function code=x1x1,ALU control=001 (or)
 	if (f2&~(f0))gout=3'b000;		//function code=x1x0,ALU control=000 (and)
-end
+	if (~(f5)&f4~(f3)&f2&f1&~(f0))gout=3'b011; //TODO: funct code=010110?? function code=x0111, ALU control = 011 (balrz)
+end 
 end
 endmodule
