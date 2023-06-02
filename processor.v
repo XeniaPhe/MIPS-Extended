@@ -80,19 +80,12 @@ mult2_to_1_5  mult1(out1, instruc[20:16],instruc[15:11],regdest);
 //mux with ALUSrc control
 mult2_to_1_32 mult2(out2, datab,extad,alusrc);
 
+wire toreg;
+assign toreg=memtoreg|balrz; 
+
 //mux with MemToReg control
-//mult2_to_1_32 mult3(out3, sum,dpack,memtoreg);
+mult2_to_1_32 mult3(out3, sum,dpack,toreg);
 
-// Declare a 2-bit wire
-wire [1:0] select_bits_mult3;
-
-// Assign values to the wire
-assign select_bits_mult3[0] = memtoreg;
-assign select_bits_mult3[1] = balrz;
-
-//TODO: check this there are 2 sum inputs!!!
-// Pass the wire as an input to the module
-mult3_to_1_32 mult3(out3, sum, dpack, sum, select_bits_mult3);
 
 //mux with (Branch&ALUZero) control
 //mult2_to_1_32 mult4(out4, adder1out,adder2out,pcsrc);
