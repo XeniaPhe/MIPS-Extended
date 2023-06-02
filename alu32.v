@@ -23,7 +23,7 @@ begin
 		  end
 	3'b000: sum=a & b;	//ALU control line=000, AND
 	3'b001: sum=a|b;		//ALU control line=001, OR
-	3'b011: sum=a<<2;		//ALU control line=011, balrz convert to byte address
+	3'b011: sum=a;		//ALU control line=011, balrz 
 	default: sum=31'bx;	
 	endcase
 zout=~(|sum);

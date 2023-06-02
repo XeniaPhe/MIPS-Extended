@@ -90,8 +90,9 @@ wire [1:0] select_bits_mult3;
 assign select_bits_mult3[0] = memtoreg;
 assign select_bits_mult3[1] = balrz;
 
+//TODO: check this there are 2 sum inputs!!!
 // Pass the wire as an input to the module
-mult3_to_1_32 mult3(out3, sum, dpack, select_bits_mult3);
+mult3_to_1_32 mult3(out3, sum, dpack, sum, select_bits_mult3);
 
 //mux with (Branch&ALUZero) control
 //mult2_to_1_32 mult4(out4, adder1out,adder2out,pcsrc);
@@ -103,8 +104,11 @@ wire [1:0] select_bits_mult4;
 assign select_bits_mult3[0] = pcsrc;
 assign select_bits_mult3[1] = balrz&zout;
 
+
+//TODO: check this there are 2 sum inputs!!!
+//TODO: don't forget to shift left 2 to convert word address to byte address
 // Pass the wire as an input to the module
-mult3_to_1_32 mult3(out4, sum, dpack, select_bits_mult3);
+mult3_to_1_32 mult3(out4, sum, dpack, sum, select_bits_mult3);
 
 // load pc
 always @(negedge clk)
