@@ -30,3 +30,6 @@ zout=~(|sum);
 n=sum[31];
 end
 endmodule
+
+
+//TODO: make sure that the z register shows the correct value which is the zout of the previous instruction
