@@ -3,7 +3,7 @@
 `include "alucont.v"
 `include "control.v"
 `include "mult2_to_1_32.v"
-`include "mult3_to_1_32.v"
+`include "mult4_to_1_32.v"
 `include "mult2_to_1_5.v"
 `include "shift.v"
 `include "signext.v"
@@ -106,7 +106,7 @@ assign select_bits_mult4[1] = balrz&zout;
 shift shift1(sextad,sum);
 
 // Pass the wire as an input to the module
-mult3_to_1_32 mult4(out4, adder1out,adder2out,sextad,select_bits_mult4);
+mult4_to_1_32 mult4(out4, adder1out,adder2out,sextad,select_bits_mult4);
 
 // load pc
 always @(negedge clk)
