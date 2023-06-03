@@ -111,7 +111,7 @@ assign select_bits_mult4[1] = (~branch) & (((~regtoreg) & jump) | (regtoreg & (~
 shift shift1(sextad,sum);
 
 // Pass the wire as an input to the module
-mult4_to_1_32 mult4(out4, pcnext,brlabel,sextad,sum,select_bits_mult4);
+mult4_to_1_32 mult4(out4, pcnext,brlabel,sextad,dpack,select_bits_mult4);
 
 // load pc
 always @(negedge clk)
