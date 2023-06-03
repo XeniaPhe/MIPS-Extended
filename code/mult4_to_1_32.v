@@ -1,5 +1,5 @@
-module mult3_to_1_32(out, i0, i1, i2, s);
-input [31:0] i0, i1, i2;
+module mult4_to_1_32(out, i0, i1, i2, i3, s);
+input [31:0] i0, i1, i2, i3;
 input [1:0] s;
 output reg [31:0] out;
 
@@ -9,7 +9,7 @@ begin
 		2'b00: out = i0;
 		2'b01: out = i1;
 		2'b10: out = i2;
-		2'b11: out = 32'b0;
+		2'b11: out = i3;
 	endcase
 end
 endmodule
