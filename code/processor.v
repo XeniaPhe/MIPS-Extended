@@ -38,7 +38,8 @@ dpack;	//Read data output of memory (data read from memory)
 
 wire [2:0] gout;	//Output of ALU control unit
 
-wire z,n,v;		//Status registers
+wire _n, _v;	//Values of status registers returned from the ALU(zout also)
+reg z, n, v;	//Status registers
 
 wire zout,	//Zero output of ALU
 //Control signals
@@ -52,14 +53,20 @@ integer i;
 // datamemory connections
 
 always @(posedge clk)
-//write data to memory
-if (memwrite)
-begin 
-//sum stores address,datab stores the value to be written
-datmem[sum[4:0]+3]=datab[7:0];
-datmem[sum[4:0]+2]=datab[15:8];
-datmem[sum[4:0]+1]=datab[23:16];
-datmem[sum[4:0]]=datab[31:24];
+begin
+	z = zout;
+	n = _n;
+	v = _v;
+
+	//write data to memory
+	if (memwrite)
+	begin 
+		//sum stores address,datab stores the value to be written
+		datmem[sum[4:0]+3]=datab[7:0];
+		datmem[sum[4:0]+2]=datab[15:8];
+		datmem[sum[4:0]+1]=datab[23:16];
+		datmem[sum[4:0]]=datab[31:24];
+	end
 end
 
 //instruction memory
@@ -113,7 +120,7 @@ pc=out4;
 // alu, adder and control logic connections
 
 //ALU unit
-alu32 alu1(sum,n,v,dataa,out2,zout,gout);
+alu32 alu1(sum,_n,_v,dataa,out2,zout,gout);
 
 //adder which adds PC and 4
 adder add1(pc,32'h4,pcnext);
