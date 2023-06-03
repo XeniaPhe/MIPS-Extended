@@ -3,9 +3,10 @@ module control(
     input [5:0] funct,
     output regdest,
     output alusrc,
-    output jump,
+    output jmem,
+    output bmem,
     output memtoreg,
-    output regtoreg,
+    output pctoreg,
     output regwrite,
     output memread,
     output memwrite,
@@ -20,15 +21,16 @@ assign lw=in[5]& (~in[4])&(~in[3])&(~in[2])&in[1]&in[0];
 assign sw=in[5]& (~in[4])&in[3]&(~in[2])&in[1]&in[0];
 assign beq=~in[5]& (~in[4])&(~in[3])&in[2]&(~in[1])&(~in[0]);
 assign regdest=rformat;
-assign alusrc=lw|sw;
+assign alusrc=lw|sw|bmem;
 assign memtoreg=lw;
 assign regwrite=rformat|lw;
-assign memread=lw;
+assign memread=lw|bmem|jmem;
 assign memwrite=sw;
 assign branch=beq;
 assign aluop1=rformat;
 assign aluop2=beq;
-assign regtoreg = rformat & (~funct[5]) & funct[4] & (~funct[3] & funct[2] & funct[1] & (~funct[0]));
-assign jump = rformat & (funct[5] & (~funct[4]) & (funct[3]) & funct[2] & (~funct[1]) & funct[0]);
+assign pctoreg = rformat & (~funct[5]) & funct[4] & (~funct[3] & funct[2] & funct[1] & (~funct[0]));
+assign jmem = rformat & (funct[5] & (~funct[4]) & (funct[3]) & funct[2] & (~funct[1]) & funct[0]);
+assign bmem = (~in[5]) & in[4] & (~in[3]) & in[2] & (~in[1]) & (~in[0]); 
 
 endmodule

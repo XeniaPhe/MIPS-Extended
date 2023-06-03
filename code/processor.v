@@ -43,7 +43,7 @@ reg z, n, v;	//Status registers
 
 wire zout,	//Zero output of ALU
 //Control signals
-jump,regtoreg,regdest,alusrc,memtoreg,regwrite,memread,memwrite,branch,aluop1,aluop0;
+bmem,jmem,pctoreg,regdest,alusrc,memtoreg,regwrite,memread,memwrite,branch,aluop1,aluop0;
 
 //32-size register file (32 bit(1 word) for each register)
 reg [31:0] registerfile[0:31];
@@ -54,10 +54,6 @@ integer i;
 
 always @(posedge clk)
 begin
-	z = zout;
-	n = _n;
-	v = _v;
-
 	//write data to memory
 	if (memwrite)
 	begin 
@@ -67,6 +63,18 @@ begin
 		datmem[sum[4:0]+1]=datab[23:16];
 		datmem[sum[4:0]]=datab[31:24];
 	end
+end
+
+// load pc
+always @(negedge clk)
+begin
+	pc = out4;
+	z = zout;
+	n = _n;
+	v = _v;
+
+	if(jmem || pctoreg)
+		registerfile[pctoreg ? inst15_11 : 31] = pc;
 end
 
 //instruction memory
@@ -84,7 +92,7 @@ end
 assign dataa=registerfile[inst25_21];//Read register 1
 assign datab=registerfile[inst20_16];//Read register 2
 always @(posedge clk)
- registerfile[out1]= (regwrite|regtoreg) ? out3:registerfile[out1];//Write data to register
+ registerfile[out1]= (regwrite|pctoreg) ? out3:registerfile[out1];//Write data to register
 
 //read data from memory, sum stores address
 assign dpack={datmem[sum[5:0]],datmem[sum[5:0]+1],datmem[sum[5:0]+2],datmem[sum[5:0]+3]};
@@ -96,28 +104,22 @@ mult2_to_1_5  mult1(out1, instruc[20:16],instruc[15:11],regdest);
 //mux with ALUSrc control
 mult2_to_1_32 mult2(out2, datab,extad,alusrc);
 
-assign regtoreg=memtoreg&~(regtoreg);
-mult2_to_1_32 mult3(out3, sum,dpack,regtoreg);
+assign pctoreg=memtoreg&~(pctoreg);
+mult2_to_1_32 mult3(out3, sum,dpack,pctoreg);
 
 
 // Declare a 2-bit wire
 wire [1:0] select_bits_mult4;
 
 // Assign values to the wire
-assign select_bits_mult4[0] =  (~regtoreg) & (((~jump) & branch & zout) | (jump & (~branch)));
-assign select_bits_mult4[1] = (~branch) & (((~regtoreg) & jump) | (regtoreg & (~jump) & z));
+assign select_bits_mult4[0] = (pctoreg | jmem | bmem | branch) & ((~pctoreg) | jmem | bmem | branch | (~z));
+assign select_bits_mult4[1] = (pctoreg | jmem | bmem | branch) & (pctoreg | jmem | bmem | (~branch) | (~zout));
 
 //shift alu result left by 2
 shift shift1(sextad,sum);
 
 // Pass the wire as an input to the module
 mult4_to_1_32 mult4(out4, pcnext,brlabel,sextad,dpack,select_bits_mult4);
-
-// load pc
-always @(negedge clk)
-pc=out4;
-
-// alu, adder and control logic connections
 
 //ALU unit
 alu32 alu1(sum,_n,_v,dataa,out2,zout,gout);
@@ -129,7 +131,7 @@ adder add1(pc,32'h4,pcnext);
 adder add2(pcnext,sextad,brlabel);
 
 //Control unit
-control cont(instruc[31:26],instruc[5:0],regdest,alusrc,jump,memtoreg,regtoreg,regwrite,memread,memwrite,branch,
+control cont(instruc[31:26],instruc[5:0],regdest,alusrc,jmem,bmem,memtoreg,pctoreg,regwrite,memread,memwrite,branch,
 aluop1,aluop0);
 
 //Sign extend unit
