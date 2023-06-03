@@ -3,6 +3,7 @@
 `include "alucont.v"
 `include "control.v"
 `include "mult2_to_1_32.v"
+`include "mult3_to_1_32.v"
 `include "mult2_to_1_5.v"
 `include "shift.v"
 `include "signext.v"
@@ -40,7 +41,7 @@ wire [2:0] gout;	//Output of ALU control unit
 wire zout,	//Zero output of ALU
 pcsrc,	//Output of AND gate with Branch and ZeroOut inputs
 //Control signals
-regdest,alusrc,memtoreg,regwrite,memread,memwrite,branch,aluop1,aluop0;
+balrz,regdest,alusrc,memtoreg,regwrite,memread,memwrite,branch,aluop1,aluop0;
 
 //32-size register file (32 bit(1 word) for each register)
 reg [31:0] registerfile[0:31];
@@ -75,7 +76,7 @@ end
 assign dataa=registerfile[inst25_21];//Read register 1
 assign datab=registerfile[inst20_16];//Read register 2
 always @(posedge clk)
- registerfile[out1]= regwrite ? out3:registerfile[out1];//Write data to register
+ registerfile[out1]= (regwrite|balrz) ? out3:registerfile[out1];//Write data to register
 
 //read data from memory, sum stores address
 assign dpack={datmem[sum[5:0]],datmem[sum[5:0]+1],datmem[sum[5:0]+2],datmem[sum[5:0]+3]};
@@ -87,11 +88,25 @@ mult2_to_1_5  mult1(out1, instruc[20:16],instruc[15:11],regdest);
 //mux with ALUSrc control
 mult2_to_1_32 mult2(out2, datab,extad,alusrc);
 
-//mux with MemToReg control
-mult2_to_1_32 mult3(out3, sum,dpack,memtoreg);
+wire regtoreg;
+assign regtoreg=memtoreg&~(balrz);
+mult2_to_1_32 mult3(out3, sum,dpack,regtoreg);
 
-//mux with (Branch&ALUZero) control
-mult2_to_1_32 mult4(out4, adder1out,adder2out,pcsrc);
+
+//mult2_to_1_32 mult4(out4, adder1out,adder2out,pcsrc);
+
+// Declare a 2-bit wire
+wire [1:0] select_bits_mult4;
+
+// Assign values to the wire
+assign select_bits_mult4[0] = pcsrc;
+assign select_bits_mult4[1] = balrz&zout;
+
+//shift alu result left by 2
+shift shift1(sextad,sum);
+
+// Pass the wire as an input to the module
+mult3_to_1_32 mult4(out4, adder1out,adder2out,sextad,select_bits_mult4);
 
 // load pc
 always @(negedge clk)
@@ -100,7 +115,7 @@ pc=out4;
 // alu, adder and control logic connections
 
 //ALU unit
-alu32 alu1(sum,dataa,out2,zout,gout);
+alu32 alu1(sum,n,v,dataa,out2,zout,gout);
 
 //adder which adds PC and 4
 adder add1(pc,32'h4,adder1out);
@@ -116,7 +131,7 @@ aluop1,aluop0);
 signext sext(instruc[15:0],extad);
 
 //ALU control unit
-alucont acont(aluop1,aluop0,instruc[3],instruc[2], instruc[1], instruc[0] ,gout);
+alucont acont(aluop1,aluop0,instruc[5],instruc[4],instruc[3],instruc[2], instruc[1], instruc[0] ,gout);
 
 //Shift-left 2 unit
 shift shift2(sextad,extad);

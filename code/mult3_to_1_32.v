@@ -1,7 +1,7 @@
 module mult3_to_1_32(out, i0, i1, i2, s);
 input [31:0] i0, i1, i2;
 input [1:0] s;
-output [31:0] out;
+output reg [31:0] out;
 
 always @(i0 or i1 or i2 or s)
 begin
