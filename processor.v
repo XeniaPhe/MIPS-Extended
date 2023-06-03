@@ -1,3 +1,12 @@
+`include "adder.v"
+`include "alu32.v"
+`include "alucont.v"
+`include "control.v"
+`include "mult2_to_1_32.v"
+`include "mult2_to_1_5.v"
+`include "shift.v"
+`include "signext.v"
+
 module processor;
 reg [31:0] pc; //32-bit prograom counter
 reg clk; //clock
