@@ -1,3 +1,13 @@
+`include "adder.v"
+`include "alu32.v"
+`include "alucont.v"
+`include "control.v"
+`include "mult2_to_1_32.v"
+`include "mult2_to_1_5.v"
+`include "mult3_to_1_32.v"
+`include "shift.v"
+`include "signext.v"
+
 module processor;
 reg [31:0] pc; //32-bit prograom counter
 reg clk; //clock
@@ -101,7 +111,7 @@ assign select_bits_mult3[1] = balrz&zout;
 //TODO: check this there are 2 sum inputs!!!
 //TODO: don't forget to shift left 2 to convert word address to byte address
 // Pass the wire as an input to the module
-mult3_to_1_32 mult3(out4, sum, dpack, sum, select_bits_mult3);
+mult3_to_1_32 mult4(out4, sum, dpack, sum, select_bits_mult3);
 
 // load pc
 always @(negedge clk)

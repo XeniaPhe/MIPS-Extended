@@ -11,5 +11,5 @@ begin
 		2'b10: out = i2;
 		2'b11: out = 32'b0;
 	endcase
-
+end
 endmodule
