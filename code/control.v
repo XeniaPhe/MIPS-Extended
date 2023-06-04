@@ -3,6 +3,8 @@ module control(
     input [5:0] funct,
     output regdest,
     output alusrc,
+    output jz,
+    output js,
     output jmem,
     output bmem,
     output memtoreg,
@@ -32,6 +34,7 @@ assign aluop2=beq;
 assign pctoreg = rformat & (~funct[5]) & funct[4] & (~funct[3] & funct[2] & funct[1] & (~funct[0]));
 assign jmem = rformat & (funct[5] & (~funct[4]) & (funct[3]) & funct[2] & (~funct[1]) & funct[0]);
 assign bmem = (~in[5]) & in[4] & (~in[3]) & in[2] & (~in[1]) & (~in[0]);
-assign js = (~in[5]) & in[4] & (~in[3]) & ~in[2] & (in[1]) & (in[0]);
+assign js = (~in[5]) & in[4] & (~in[3]) & (~in[2]) & in[1] & in[0];
+assign jz = (~in[5]) & in[4] & in[3] & (~in[2]) & (in[1]) & (~in[0]);
 
 endmodule
