@@ -43,7 +43,7 @@ reg z, n, v;	//Status registers
 
 wire zout,	//Zero output of ALU
 //Control signals
-jz,js,bmem,jmem,pctoreg,regdest,alusrc,memtoreg,regwrite,memread,memwrite,branch,aluop1,aluop0;
+shift,jz,js,bmem,jmem,pctoreg,regdest,alusrc,memtoreg,regwrite,memread,memwrite,branch,aluop1,aluop0;
 
 //32-size register file (32 bit(1 word) for each register)
 reg [31:0] registerfile[0:31];
@@ -161,7 +161,7 @@ adder add1(pc,32'h4,pcnext);
 adder add2(pcnext,sextad,brlabel);
 
 //Control unit
-control cont(instruc[31:26],instruc[5:0],regdest,alusrc,jz,js,jmem,bmem,memtoreg,pctoreg,regwrite,memread,memwrite,branch,
+control cont(instruc[31:26],instruc[5:0],regdest,alusrc,shift,jz,js,jmem,bmem,memtoreg,pctoreg,regwrite,memread,memwrite,branch,
 aluop1,aluop0);
 
 //Sign extend unit
