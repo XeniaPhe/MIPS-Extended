@@ -24,13 +24,14 @@ assign regdest=rformat;
 assign alusrc=lw|sw|bmem;
 assign memtoreg=lw;
 assign regwrite=rformat|lw;
-assign memread=lw|bmem|jmem;
-assign memwrite=sw;
+assign memread=lw|bmem|jmem|js;
+assign memwrite=sw|js;
 assign branch=beq;
 assign aluop1=rformat;
 assign aluop2=beq;
 assign pctoreg = rformat & (~funct[5]) & funct[4] & (~funct[3] & funct[2] & funct[1] & (~funct[0]));
 assign jmem = rformat & (funct[5] & (~funct[4]) & (funct[3]) & funct[2] & (~funct[1]) & funct[0]);
-assign bmem = (~in[5]) & in[4] & (~in[3]) & in[2] & (~in[1]) & (~in[0]); 
+assign bmem = (~in[5]) & in[4] & (~in[3]) & in[2] & (~in[1]) & (~in[0]);
+assign js = (~in[5]) & in[4] & (~in[3]) & ~in[2] & (in[1]) & (in[0]);
 
 endmodule

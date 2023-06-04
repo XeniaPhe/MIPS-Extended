@@ -3,7 +3,7 @@
 `include "alucont.v"
 `include "control.v"
 `include "mult2_to_1_32.v"
-`include "mult4_to_1_32.v"
+`include "mult5_to_1_32.v"
 `include "mult2_to_1_5.v"
 `include "shift.v"
 `include "signext.v"
@@ -17,7 +17,7 @@ dataa,	//Read data 1 output of Register File
 datab,	//Read data 2 output of Register File
 out2,		//Output of mux with ALUSrc control-mult2
 out3,		//Output of mux with MemToReg control-mult3
-out4,		//Output of mux with (Branch&ALUZero) control-mult4
+out5,		//Output of mux with (Branch&ALUZero) control-mult5
 sum,		//ALU result
 extad,	//Output of sign-extend unit
 pcnext,	//Output of adder which adds PC and 4-add1
@@ -43,7 +43,7 @@ reg z, n, v;	//Status registers
 
 wire zout,	//Zero output of ALU
 //Control signals
-bmem,jmem,pctoreg,regdest,alusrc,memtoreg,regwrite,memread,memwrite,branch,aluop1,aluop0;
+js,bmem,jmem,pctoreg,regdest,alusrc,memtoreg,regwrite,memread,memwrite,branch,aluop1,aluop0;
 
 //32-size register file (32 bit(1 word) for each register)
 reg [31:0] registerfile[0:31];
@@ -52,23 +52,42 @@ integer i;
 
 // datamemory connections
 
+/**
+	1- read the datmem[registerfile[29]] assign it to var x
+	2- assign x to the 5th port of the MUX
+	3- write pc to the datmem[registerfile[29]]
+	4- jump to the address x (will happen in negedge clk)
+*/
+
+reg [31:0] stackvalue;
+
 always @(posedge clk)
 begin
 	//write data to memory
 	if (memwrite)
 	begin 
-		//sum stores address,datab stores the value to be written
-		datmem[sum[4:0]+3]=datab[7:0];
-		datmem[sum[4:0]+2]=datab[15:8];
-		datmem[sum[4:0]+1]=datab[23:16];
-		datmem[sum[4:0]]=datab[31:24];
+		if (js)
+		begin
+			
+			stackvalue=datmem[registerfile[29]];
+			datmem[registerfile[29]]=pc;
+		end else
+		begin
+			//sum stores address,datab stores the value to be written
+			datmem[sum[4:0]+3]=datab[7:0];
+			datmem[sum[4:0]+2]=datab[15:8];
+			datmem[sum[4:0]+1]=datab[23:16];
+			datmem[sum[4:0]]=datab[31:24];
+
+		end	
+		
 	end
 end
 
 // load pc
 always @(negedge clk)
 begin
-	pc = out4;
+	pc = out5;
 	z = zout;
 	n = _n;
 	v = _v;
@@ -109,17 +128,18 @@ mult2_to_1_32 mult3(out3, sum,dpack,pctoreg);
 
 
 // Declare a 2-bit wire
-wire [1:0] select_bits_mult4;
+wire [2:0] select_bits_mult5;
 
 // Assign values to the wire
-assign select_bits_mult4[0] = (pctoreg | jmem | bmem | branch) & ((~pctoreg) | jmem | bmem | branch | (~z));
-assign select_bits_mult4[1] = (pctoreg | jmem | bmem | branch) & (pctoreg | jmem | bmem | (~branch) | (~zout));
+assign select_bits_mult5[0] = (pctoreg | js | jmem | bmem | branch) & ((~pctoreg) | js | jmem | bmem | branch | (~z)) & (pctoreg | (~js) | jmem | bmem | branch);
+assign select_bits_mult5[1] = (pctoreg | js | jmem | bmem | branch) & (pctoreg | js | jmem | bmem | (~branch) | (~zout)) & (pctoreg | (~js) | jmem | bmem | branch);
+assign select_bits_mult5[2] = (~pctoreg) & js & (~jmem) & (~bmem) & (~branch);
 
 //shift alu result left by 2
 shift shift1(sextad,sum);
 
 // Pass the wire as an input to the module
-mult4_to_1_32 mult4(out4, pcnext,brlabel,sextad,dpack,select_bits_mult4);
+mult5_to_1_32 mult5(out5, pcnext,brlabel,sextad,dpack,stackvalue,select_bits_mult5);
 
 //ALU unit
 alu32 alu1(sum,_n,_v,dataa,out2,zout,gout);
