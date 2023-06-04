@@ -3,6 +3,7 @@ module control(
     input [5:0] funct,
     output regdest,
     output alusrc,
+    output js,
     output jmem,
     output bmem,
     output memtoreg,
